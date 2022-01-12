@@ -1,7 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-
+const {ConnectionDB} = require('../database/config');
 class Server{
 
     constructor(){
@@ -9,8 +9,13 @@ class Server{
         this.port = process.env.PORT || 300;
         this.middleware();
         this.routes();
-
+        this.connectDB()
     }
+
+    async connectDB(){
+        await ConnectionDB();
+    }
+
     middleware(){
         this.app.use(express.json());
         this.app.use(cors());

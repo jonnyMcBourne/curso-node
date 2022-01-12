@@ -12,8 +12,6 @@ const getUsers=(req= request,res= response)=>{
             query
         });
     }
-
-    
 }
 const postUsers=( req = request, res= response)=>{
     console.log('',req.body)
