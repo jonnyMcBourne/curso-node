@@ -23,7 +23,7 @@ const UserSchema = Schema({
         required:[true,'role is mandatory'],
         enum:['ADMIN_ROLE','USER_ROLE']
     },
-    status:{
+    activeStatus:{
         type: Boolean,
         default:true,
     },
