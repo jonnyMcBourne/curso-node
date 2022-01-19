@@ -4,7 +4,7 @@ const ConnectionDB = async () => {
   mongoose
     .connect(process.env.MONGODB_CNN,{
       autoIndex:true,
-      autoCreate:true,
+      autoCreate:true
     })
     .then((connection) => {
       console.log("connection successfully");

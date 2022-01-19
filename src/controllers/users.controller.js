@@ -1,19 +1,30 @@
 const {response,request} = require("express");
-const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const req = require("express/lib/request");
+const User = require('../models/User');
+const {pagination,isValidNumber} = require('../helpers/queries-helpers');
 
-const getUsers=(req= request,res= response)=>{
-    const query = req.query;
-    if(!query){
+const getUsers= async (req= request,res= response)=>{
+    const {page=1,limit = 10} = req.query;
+    console.log('page',page,'limit',limit)
+    const {setLimit,skipTo} = pagination(limit,page)
+    console.log('setLimit',setLimit,'skiptTo',skipTo);
+    try {
+        const [total,userst] = await Promise.all([
+            User.countDocuments({activeStatus:true}),
+            User.find({activeStatus:true})
+                .limit(isValidNumber(setLimit))
+                .skip(skipTo)
+         ])
         res.json({
-            ok:'GET',
-        });
-    }else{
-        res.json({
-            ok:'GET-PARAMS',
-        });
+            total,
+            userst
+        }).status(200);
+    } catch (error) {
+        res.json({error})
     }
 }
+
 const postUsers= async( req = request, res= response)=>{
     const { name, email, password, img, role, activeStatus, google } = req.body;
     const user = new User({
@@ -43,16 +54,32 @@ const postUsers= async( req = request, res= response)=>{
 }
 
 
-const putUsers=(req,res= response)=>{
-    res.json({ok:'PUT'});
+const putUsers= async (req = request,res= response)=>{
+    const {id} = req.params;
+    const { _id, google, password, email,  ...rest } = req.body;
+    try {
+        const user = await User.findByIdAndUpdate(id,rest);
+        const userUpdated = await User.findById(id);
+        res.json({
+            userUpdated
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
-const deleteUsers =(req = request ,res= response)=>{
+const deleteUsers = async (req = request ,res= response)=>{
     const { id }=req.params;
-    res.json({
-        ok:'DELETE',
-        id:id
-    });
+    try {
+        const user = await User.findByIdAndUpdate(id,{activeStatus:false})
+        res.json({
+            user,
+            msg:'user deleted successfully'
+        }).status(204)
+    } catch (error) {
+        console.log(error)
+    }
+    
 }
 
 
