@@ -6,9 +6,8 @@ const {pagination,isValidNumber} = require('../helpers/queries-helpers');
 
 const getUsers= async (req= request,res= response)=>{
     const {page=1,limit = 10} = req.query;
-    console.log('page',page,'limit',limit)
     const {setLimit,skipTo} = pagination(limit,page)
-    console.log('setLimit',setLimit,'skiptTo',skipTo);
+
     try {
         const [total,userst] = await Promise.all([
             User.countDocuments({activeStatus:true}),
@@ -40,7 +39,6 @@ const postUsers= async( req = request, res= response)=>{
     user.password = bcrypt.hashSync(password,salt);
     user.save()
       .then((user) => {
-        console.log('user created succesfullt: {email:',user.email);
         res.status(201).json({
           user
         });
